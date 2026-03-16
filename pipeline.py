@@ -97,7 +97,7 @@ def generate_summary(df):
     top_category = df.groupby('product_category')['revenue'].sum().idxmax()
     return{
     'total_revenue' : df['revenue'].sum(),
-    'avg_order_value' : df['reveune'].mean(),
+    'avg_order_value' : df['revenue'].mean(),
     ' record_count' : len(df)
 }
     pass
