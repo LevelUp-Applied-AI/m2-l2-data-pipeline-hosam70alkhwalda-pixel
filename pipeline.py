@@ -102,44 +102,92 @@ def generate_summary(df):
 }
     pass
 
-
-def create_visualizations(df, output_dir=OUTPUT_DIR):
-    """Create and save 3 charts as PNG files.
-
-    Charts to create:
-    1. Bar chart: total revenue by product category
-    2. Line chart: daily revenue trend (aggregate revenue by date)
-    3. Horizontal bar chart: average order value by payment method
-
-    Save each chart as a PNG using fig.savefig().
-    Do NOT use plt.show() — it blocks execution in pipeline scripts.
-    Close each figure with plt.close(fig) after saving.
-
-    Args:
-        df (pd.DataFrame): Enriched DataFrame from add_features().
-        output_dir (str): Directory to save PNG files (create if needed).
-    """
+def create_visualizations(df, output_dir="output"):
+    """Create and save 3 charts as PNG files."""
     os.makedirs(output_dir, exist_ok=True)
     
-    fig, ax = plt.subplots(figsize=(8,5))
+    # Standardize column names just in case
+    df.columns = df.columns.str.strip().str.lower()
+
+    # --- 1. Bar Chart: Total Revenue by Category ---
+    fig, ax = plt.subplots(figsize=(10, 6))
     revenue_by_category = df.groupby('product_category')['revenue'].sum().sort_values(ascending=False)
     revenue_by_category.plot(kind='bar', ax=ax, color='steelblue', edgecolor='white')
-
     ax.set_title("Total Revenue by Product Category", fontsize=14, fontweight="bold")
-    ax.set_xlabel("Product Category")
-    ax.set_ylabel("Revenue")
-   
-
+    ax.set_ylabel("Total Revenue ($)")
     plt.tight_layout()
-
     path1 = os.path.join(output_dir, "revenue_by_category.png")
     fig.savefig(path1, dpi=150, bbox_inches='tight')
     plt.close(fig)
 
-    print(f"[create_visualizations] Saved: {path1}")
+    # --- 2. Line Chart: Daily Revenue Trend (FIXED COLUMN NAME) ---
+    # Changed from 'order_date' to 'date' based on your terminal output
+    date_col = 'date' if 'date' in df.columns else 'order_date'
+    
+    fig, ax = plt.subplots(figsize=(10, 6))
+    df[date_col] = pd.to_datetime(df[date_col])
+    daily_revenue = df.groupby(date_col)['revenue'].sum().sort_index()
+    daily_revenue.plot(kind='line', ax=ax, marker='o', color='forestgreen', linewidth=2)
+    
+    ax.set_title("Daily Revenue Trend", fontsize=14, fontweight="bold")
+    ax.set_ylabel("Revenue ($)")
+    ax.grid(True, linestyle='--', alpha=0.7)
+    plt.tight_layout()
+    
+    path2 = os.path.join(output_dir, "daily_revenue_trend.png")
+    fig.savefig(path2, dpi=150, bbox_inches='tight')
+    plt.close(fig)
+
+    # --- 3. Horizontal Bar Chart: Average Order Value ---
+    fig, ax = plt.subplots(figsize=(10, 6))
+    avg_order_val = df.groupby('payment_method')['revenue'].mean().sort_values()
+    avg_order_val.plot(kind='barh', ax=ax, color='salmon', edgecolor='white')
+    ax.set_title("Average Order Value by Payment Method", fontsize=14, fontweight="bold")
+    ax.set_xlabel("Average Value ($)")
+    plt.tight_layout()
+    
+    path3 = os.path.join(output_dir, "avg_order_value_payment.png")
+    fig.savefig(path3, dpi=150, bbox_inches='tight')
+    plt.close(fig)
+    
+    print(f"[create_visualizations] Successfully saved 3 charts to {output_dir}")
+# def create_visualizations(df, output_dir=OUTPUT_DIR):
+#     """Create and save 3 charts as PNG files.
+
+#     Charts to create:
+#     1. Bar chart: total revenue by product category
+#     2. Line chart: daily revenue trend (aggregate revenue by date)
+#     3. Horizontal bar chart: average order value by payment method
+
+#     Save each chart as a PNG using fig.savefig().
+#     Do NOT use plt.show() — it blocks execution in pipeline scripts.
+#     Close each figure with plt.close(fig) after saving.
+
+#     Args:
+#         df (pd.DataFrame): Enriched DataFrame from add_features().
+#         output_dir (str): Directory to save PNG files (create if needed).
+#     """
+#     os.makedirs(output_dir, exist_ok=True)
+    
+#     fig, ax = plt.subplots(figsize=(8,5))
+#     revenue_by_category = df.groupby('product_category')['revenue'].sum().sort_values(ascending=False)
+#     revenue_by_category.plot(kind='bar', ax=ax, color='steelblue', edgecolor='white')
+
+#     ax.set_title("Total Revenue by Product Category", fontsize=14, fontweight="bold")
+#     ax.set_xlabel("Product Category")
+#     ax.set_ylabel("Revenue")
+   
+
+#     plt.tight_layout()
+
+#     path1 = os.path.join(output_dir, "revenue_by_category.png")
+#     fig.savefig(path1, dpi=150, bbox_inches='tight')
+#     plt.close(fig)
+
+#     print(f"[create_visualizations] Saved: {path1}")
     
 
-    pass
+#     pass
 
 
 def main():
