@@ -26,3 +26,6 @@ Thumbs.db
 # Note: output/ is NOT gitignored for this lab.
 # Commit your generated PNG files — they are evidence of pipeline execution.
 # In a production context, generated artifacts would typically be excluded.
+
+
+hosam/
